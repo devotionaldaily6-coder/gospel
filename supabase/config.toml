@@ -1,0 +1,5 @@
+[functions.send-admin-email]
+verify_jwt = false
+
+[functions.send-free-sample]
+verify_jwt = false
