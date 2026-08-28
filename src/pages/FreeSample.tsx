@@ -178,7 +178,7 @@ export default function FreeSamplePage() {
                 <p className="text-white/55">Thank you! Your free 7-Day Sample is on its way. We pray these devotionals help you encounter Jesus every day.</p>
               </div>
             ) : (
-              <form onSubmit={async (e)=>{ e.preventDefault(); if(!email||!firstName||!location.country) { setFormError('Please fill in your name, email, and country.'); return; } try { await insertFreeSampleLead({first_name:firstName,email,source:'free_sample_page',country:location.country,city_region:location.city_region}); setSubmitted(true); } catch { setFormError('Something went wrong. Please try again.'); } }} className="space-y-3.5" noValidate>
+              <form onSubmit={async (e)=>{ e.preventDefault(); if(!email||!firstName||!location.country) { setFormError('Please fill in your name, email, and country.'); return; } try { setFormError(''); await insertFreeSampleLead({first_name:firstName,email,source:'free_sample_page',country:location.country,city_region:location.city_region}); setSubmitted(true); } catch (err) { setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.'); } }} className="space-y-3.5" noValidate>
                 <input type="text" placeholder="Full Name *" value={firstName} onChange={e=>setFirstName(e.target.value)} required aria-label="Full name"
                   className="w-full px-5 py-3.5 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/35 focus:outline-none focus:border-gold-400 transition-colors text-sm" />
                 <input type="email" placeholder="Email Address *" value={email} onChange={e=>setEmail(e.target.value)} required aria-label="Email address"

@@ -39,11 +39,13 @@ export async function insertFreeSampleLead(data: {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
     },
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    throw new Error(`Request failed (${response.status})`);
+    const errBody = await response.json().catch(() => ({}));
+    throw new Error(errBody.error ?? `Request failed (${response.status})`);
   }
   const result = await response.json();
   if (result.error) {
@@ -243,6 +245,7 @@ export async function sendAdminEmailWithAttachments(payload: {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
     },
     body: JSON.stringify(payload),
   });
