@@ -176,6 +176,7 @@ export default function AdminPage() {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           to: composeTo.trim(),
@@ -562,9 +563,9 @@ export default function AdminPage() {
                     <h2 className="font-playfair text-xl font-bold text-white">Email Settings</h2>
                   </div>
                   <p className="text-sm text-white/50 mb-6">
-                    When someone requests a free sample, the system automatically sends them a
-                    beautifully designed email with their 7-day devotional sample. To enable this,
-                    connect a free Resend account below.
+                    Connect a free Resend account to send emails (free samples, replies to
+                    submissions) and receive replies back into your inbox. Both sending and
+                    receiving use the same API key below.
                   </p>
 
                   {resendStatus === 'configured' ? (
@@ -572,7 +573,7 @@ export default function AdminPage() {
                       <CheckCircle2 size={18} className="text-green-400 shrink-0 mt-0.5" aria-hidden="true" />
                       <div>
                         <p className="text-sm font-medium text-green-300">Email service is active</p>
-                        <p className="text-xs text-green-400/70 mt-0.5">Free sample emails are being sent automatically when someone fills the form.</p>
+                        <p className="text-xs text-green-400/70 mt-0.5">You can send emails from the dashboard and receive replies in your inbox.</p>
                       </div>
                     </div>
                   ) : resendStatus === 'not_configured' ? (
@@ -580,7 +581,7 @@ export default function AdminPage() {
                       <AlertCircle size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
                       <div>
                         <p className="text-sm font-medium text-amber-300">Email service not yet connected</p>
-                        <p className="text-xs text-amber-400/70 mt-0.5">Leads are still saved in the dashboard, but no email is sent to the visitor yet.</p>
+                        <p className="text-xs text-amber-400/70 mt-0.5">Leads are still saved in the dashboard, but no emails can be sent or received yet.</p>
                       </div>
                     </div>
                   ) : null}
@@ -651,9 +652,48 @@ export default function AdminPage() {
                       </li>
                       <li className="flex gap-3">
                         <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
-                        <span>Click Save. The free sample email will be sent automatically from <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">onboarding@resend.dev</code> until you verify your own domain in Resend.</span>
+                        <span>Click Save. Emails will be sent from <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">onboarding@resend.dev</code> until you verify your own domain in Resend.</span>
                       </li>
                     </ol>
+                  </div>
+
+                  <div className="mt-6 p-5 rounded-xl bg-white/[0.03] border border-white/10">
+                    <h3 className="font-playfair text-base font-bold text-white mb-3">Receiving emails (inbox replies)</h3>
+                    <p className="text-sm text-white/50 mb-4">
+                      To receive replies and incoming emails in your dashboard inbox, set up
+                      Resend's inbound email feature:
+                    </p>
+                    <ol className="space-y-2.5 text-sm text-white/60">
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        <span>In Resend, go to <a href="https://resend.com/emails/receiving" target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:text-gold-200 underline">Emails &rarr; Receiving</a> to find your auto-generated inbound address (e.g. <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">@your-name.resend.app</code>).</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        <span>Go to <a href="https://resend.com/webhooks" target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:text-gold-200 underline">Webhooks</a> and create a new webhook.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        <span>Set the endpoint URL to your receive-inbound-email function:</span>
+                      </li>
+                    </ol>
+                    <div className="mt-3 mb-1 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <code className="text-gold-300 text-xs break-all">{SUPABASE_URL}/functions/v1/receive-inbound-email</code>
+                    </div>
+                    <ol className="space-y-2.5 text-sm text-white/60 mt-3">
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                        <span>Select the <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">email.received</code> event and save the webhook.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">5</span>
+                        <span>Anyone who emails your inbound address will appear in the Inbox tab. You can reply directly from the dashboard.</span>
+                      </li>
+                    </ol>
+                    <p className="text-xs text-white/35 mt-4">
+                      For a branded email address (e.g. hello@inhimdaily.org), add an MX record
+                      to your domain pointing to Resend. See the Resend docs for details.
+                    </p>
                   </div>
                 </div>
               )}
